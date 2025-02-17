@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booklet</title>
+    <title>HappyBooklet</title>
     <link href='https://fonts.googleapis.com/css?family=Actor' rel='stylesheet'>
+    <link href='https://fonts.googleapis.com/css?family=Rubik Doodle Shadow' rel='stylesheet'>
     <style>
         body {
             background: linear-gradient(to right, #ff9a9e, #fad0c4);
@@ -12,6 +14,7 @@
             text-align: center;
             padding: 20px;
             overflow: hidden;
+            box-sizing: border-box;
         }
 
         .container {
@@ -22,7 +25,8 @@
             border-radius: 10px;
         }
 
-        textarea, input {
+        textarea,
+        input {
             font-family: 'Actor';
             width: 95%;
             margin-inline: auto 0;
@@ -52,8 +56,8 @@
             font-size: 1.5rem;
         }
 
-        h1{
-            font-family: 'Actor';
+        h1 {
+            font-family: 'Rubik Doodle Shadow';
             font-size: 4rem;
         }
 
@@ -62,16 +66,20 @@
         }
 
         @media (max-width: 600px) {
+            body {
+                margin: 0px;
+            }
+
             .buttons {
                 flex-direction: column;
             }
 
-            h1{
+            h1 {
                 width: 100%;
-                font-size: 2.5rem;
+                font-size: 4rem;
             }
 
-            .buttons button{
+            .buttons button {
                 font-size: 1.3rem;
             }
         }
@@ -121,16 +129,18 @@
 
         .emoji-rain {
             position: absolute;
-            font-size: 2rem;
+            font-size: 3rem;
             opacity: 0;
             animation: rain 2s linear forwards;
+            justify-content: center;
         }
 
         @keyframes rain {
             0% {
-                top: -50px;
+                top: -40px;
                 opacity: 1;
             }
+
             100% {
                 top: 100%;
                 opacity: 0;
@@ -138,6 +148,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <h1>Add Our Message</h1>
@@ -188,9 +199,9 @@
             }
 
             // Refresh the page after emoji rain ends (after 3 seconds)
-            setTimeout(function() {
+            setTimeout(function () {
                 location.reload(); // Refresh page
-            }, 3000); 
+            }, 3000);
         }
 
         function createEmoji() {
@@ -216,4 +227,5 @@
     </script>
 
 </body>
+
 </html>
