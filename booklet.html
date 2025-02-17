@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booklet</title>
+    <link href='https://fonts.googleapis.com/css?family=Actor' rel='stylesheet'>
+    <style>
+        body {
+            background: linear-gradient(to right, #ff9a9e, #fad0c4);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        textarea, input {
+            font-family: 'Actor';
+            width: 95%;
+            margin-inline: auto 0;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: none;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .buttons button {
+            font-family: 'Actor';
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(to right, #ff4f4f, #ff2e63);
+            color: white;
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+
+        h1{
+            font-family: 'Actor';
+            font-size: 4rem;
+        }
+
+        .buttons button:hover {
+            background: linear-gradient(to right, #ff2e63, #ff4f4f);
+        }
+
+        @media (max-width: 600px) {
+            .buttons {
+                flex-direction: column;
+            }
+
+            h1{
+                width: 100%;
+                font-size: 2.5rem;
+            }
+
+            .buttons button{
+                font-size: 1.3rem;
+            }
+        }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            color: black;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            z-index: 1000;
+            font-family: 'Actor';
+            font-size: 2rem;
+            width: 300px;
+        }
+
+        .popup button {
+            margin: 10px;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 1.5rem;
+        }
+
+        .popup .close {
+            background: #ff4f4f;
+            color: white;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+        }
+
+        .emoji-rain {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0;
+            animation: rain 2s linear forwards;
+        }
+
+        @keyframes rain {
+            0% {
+                top: -50px;
+                opacity: 1;
+            }
+            100% {
+                top: 100%;
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Add Our Message</h1>
+
+    <div class="container">
+        <input type="date" id="date">
+        <textarea id="message" placeholder="Write your message..."></textarea>
+        <div class="buttons">
+            <button onclick="saveMessage()">Save Message</button>
+            <button onclick="window.location.href='messages.html'">View Saved Messages</button>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+
+    <div class="popup" id="savePopup">
+        <p>Message saved successfully:)</p>
+        <button class="close" onclick="startEmojiRain()">OK</button>
+    </div>
+
+    <script>
+        function saveMessage() {
+            let message = document.getElementById("message").value;
+            let date = document.getElementById("date").value;
+
+            if (!message || !date) {
+                alert("Please enter both message and date!");
+                return;
+            }
+
+            let messages = JSON.parse(localStorage.getItem("messages")) || [];
+            messages.push({ message, date });
+            localStorage.setItem("messages", JSON.stringify(messages));
+
+            showPopup();
+        }
+
+        function showPopup() {
+            document.getElementById("overlay").style.display = "block";
+            document.getElementById("savePopup").style.display = "block";
+        }
+
+        function startEmojiRain() {
+            closePopup();
+            // Trigger the emoji rain effect
+            for (let i = 0; i < 30; i++) { // Create 30 emojis for the rain
+                createEmoji();
+            }
+
+            // Refresh the page after emoji rain ends (after 3 seconds)
+            setTimeout(function() {
+                location.reload(); // Refresh page
+            }, 3000); 
+        }
+
+        function createEmoji() {
+            let emojiContainer = document.createElement("div");
+            emojiContainer.classList.add("emoji-rain");
+            emojiContainer.textContent = "💐";
+
+            // Random horizontal position for the emoji
+            emojiContainer.style.left = Math.random() * 100 + "vw"; // Random position on the x-axis
+            emojiContainer.style.animationDuration = Math.random() * 2 + 2 + "s"; // Random fall time (between 2s and 4s)
+            document.body.appendChild(emojiContainer);
+
+            // Remove emoji after the animation ends
+            setTimeout(() => {
+                emojiContainer.remove();
+            }, 3000); // Remove after 3 seconds
+        }
+
+        function closePopup() {
+            document.getElementById("overlay").style.display = "none";
+            document.getElementById("savePopup").style.display = "none";
+        }
+    </script>
+
+</body>
+</html>
