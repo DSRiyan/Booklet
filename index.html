@@ -1,42 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unlock Booklet</title>
+    <title>HappyBooklet</title>
     <link href='https://fonts.googleapis.com/css?family=Actor' rel='stylesheet'>
     <style>
         body {
-            font-family: 'Actor';
-            text-align: center;
-            color: white;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(to right, #ff9a9e, #fad0c4);
-            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-        }
-
-        #login-page {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 3);
-            width: 90%;
-            max-width: 350px;
-        }
-
-        input, button {
-            width: 90%;
-            padding: 20px;
-            border-radius: 8px;
-            border: none;
-            margin-top: 10px;
-            font-size: 1.4rem;
+            height: 100vh;
+            background: linear-gradient(to right, #ff9a9e, #fad0c4);
+            color: white;
             text-align: center;
+            flex-direction: column;
+        }
+
+        .container {
+            font-family: 'Actor';
+            letter-spacing: 1px;
+            width: 300px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 3);
+        }
+
+        input,
+        button {
+            font-family: 'Actor';
+            padding: 10px;
+            margin: 10px;
+            border: none;
             outline: none;
+            border-radius: 7px;
+        }
+
+        ::placeholder {
+            font-size: 1rem;
+        }
+
+        input {
+            width: 90%;
+            text-align: center;
         }
 
         button {
@@ -44,38 +52,151 @@
             color: white;
             cursor: pointer;
             transition: transform 0.2s;
+            font-size: 1.4rem;
         }
 
         button:hover {
             transform: scale(1.05);
         }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            color: black;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 3);
+            text-align: center;
+        }
+
+        .popup button {
+            background: #ff4d6d;
+            color: white;
+            margin-top: 10px;
+        }
     </style>
 </head>
-<body>
 
-    <div id="login-page">
-        <h1>Welcome Anusha💐</h1>
-        <input type="password" id="password" placeholder="Enter Password" oninput="updateButton()">
-        <button id="login-btn" onclick="checkPassword()">Lock 🔒</button>
+<body>
+    <div class="container" id="registerBox" style="display: none;">
+        <h2>Create Your Account :)</h2>
+        <input type="text" id="username" placeholder="Enter Your Name" required><br>
+        <input type="password" id="password" placeholder="Create Password (letters & numbers)" required><br>
+        <input type="text" id="securityQuestion" placeholder="Your Favourite Film" required><br>
+        <button onclick="registerUser()">Register</button>
+    </div>
+
+    <div class="container" id="loginBox" style="display: none;">
+        <h2 id="welcomeText"></h2>
+        <input type="password" id="loginPassword" placeholder="Enter your password" required><br>
+        <button onclick="loginUser()">Unlock</button>
+        <button onclick="showForgotPopup()">Forgot Password?</button>
+    </div>
+
+    <div class="popup" id="forgotPopup">
+        <p>Your Favourite Film</p>
+        <input type="text" id="securityAnswer"><br>
+        <button onclick="verifySecurityAnswer()">Submit</button>
+        <button onclick="closePopup()">Cancel</button>
     </div>
 
     <script>
-        const PASSWORD = "231224";
+        let attempts = 0;
+        let lockoutTime = localStorage.getItem("lockoutTime");
 
-        function checkPassword() {
-            let inputPassword = document.getElementById("password").value;
-            if (inputPassword === PASSWORD) {
-                window.location.href = "booklet.html";
+        window.onload = function () {
+            let storedName = localStorage.getItem("username");
+            if (storedName) {
+                document.getElementById("welcomeText").innerText = "Welcome, " + storedName + "💐";
+                document.getElementById("loginBox").style.display = "block";
             } else {
-                alert("Wrong password! Try again.");
+                document.getElementById("registerBox").style.display = "block";
             }
         }
 
-        function updateButton() {
-            let inputPassword = document.getElementById("password").value;
-            document.getElementById("login-btn").innerText = (inputPassword === PASSWORD) ? "Unlock 🔓" : "Lock 🔒";
+        function registerUser() {
+            let name = document.getElementById("username").value;
+            let password = document.getElementById("password").value;
+            let securityAnswer = document.getElementById("securityQuestion").value;
+            let regex = /^[A-Za-z0-9]+$/;
+
+            if (name.trim() === "" || password.trim() === "" || securityAnswer.trim() === "") {
+                alert("Please fill in all fields");
+                return;
+            }
+
+            if (!regex.test(password)) {
+                alert("Password must contain only letters and numbers");
+                return;
+            }
+
+            localStorage.setItem("username", name);
+            localStorage.setItem("password", password);
+            localStorage.setItem("securityAnswer", securityAnswer);
+
+            alert("Account created successfully!");
+            location.reload();
+        }
+
+        function loginUser() {
+            let enteredPassword = document.getElementById("loginPassword").value;
+            let storedPassword = localStorage.getItem("password");
+
+            if (enteredPassword === storedPassword) {
+                alert("Access granted! Redirecting to booklet...");
+                window.location.href = "booklet.html";
+            } else {
+                alert("Incorrect password. Try again.");
+            }
+        }
+
+        function showForgotPopup() {
+            let currentTime = new Date().getTime();
+            if (lockoutTime && currentTime < lockoutTime) {
+                alert("You have exceeded the attempts. Try again later.");
+                return;
+            }
+
+            document.getElementById("forgotPopup").style.display = "block";
+        }
+
+        function closePopup() {
+            document.getElementById("forgotPopup").style.display = "none";
+        }
+
+        function verifySecurityAnswer() {
+            let enteredAnswer = document.getElementById("securityAnswer").value;
+            let storedAnswer = localStorage.getItem("securityAnswer");
+
+            if (enteredAnswer === storedAnswer) {
+                let newPassword = prompt("Enter a new password (letters & numbers only):");
+                let regex = /^[A-Za-z0-9]+$/;
+
+                if (!newPassword || !regex.test(newPassword)) {
+                    alert("Invalid password format. Use only letters and numbers.");
+                    return;
+                }
+
+                localStorage.setItem("password", newPassword);
+                alert("Password reset successfully!");
+                closePopup();
+            } else {
+                attempts++;
+                if (attempts >= 3) {
+                    let futureTime = new Date().getTime() + (7 * 60 * 60 * 1000);
+                    localStorage.setItem("lockoutTime", futureTime);
+                    alert("Too many incorrect attempts. Try again in 7 hours.");
+                    closePopup();
+                } else {
+                    alert("Incorrect answer. Attempts left: " + (3 - attempts));
+                }
+            }
         }
     </script>
-
 </body>
+
 </html>
